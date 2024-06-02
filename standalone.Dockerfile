@@ -1,6 +1,6 @@
 FROM alpine:latest
 
-LABEL org.opencontainers.image.source=https://github.com/bokub/ha-linky
+LABEL org.opencontainers.image.source=https://github.com/aigle1234/test-linky
 LABEL org.opencontainers.image.description="HA Linky Standalone"
 LABEL org.opencontainers.image.licenses=MIT
 
