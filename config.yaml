@@ -1,6 +1,6 @@
 name: Linky
 description: Sync Energy dashboards with your Linky smart meter
-version: 1.4.0
+version: 2.0
 slug: linky
 init: false
 url: https://github.com/aigle1234/ha-linky.git
