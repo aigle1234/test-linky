@@ -99,7 +99,13 @@ export class HomeAssistantClient {
     stats: { start: string; state: number; sum: number }[],
   ) {
     const statisticId = getStatisticId(prm, isProduction);
-
+    // Convertir les valeurs en kWh
+    const statsInKwh = stats.map(stat => ({
+      ...stat,
+      state: stat.state / 1000,
+      sum: stat.sum / 1000,
+    }));
+    
     await this.sendMessage({
       type: 'recorder/import_statistics',
       metadata: {
@@ -110,7 +116,7 @@ export class HomeAssistantClient {
         statistic_id: statisticId,
         unit_of_measurement: 'kWh',
       },
-      stats,
+      stats: statsInKwh,
     });
   }
 
