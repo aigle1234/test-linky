@@ -113,7 +113,7 @@ export class HomeAssistantClient {
       stats: stats.map(stat => ({
         ...stat,
         sum: stat.sum / 1000, // Conversion de Wh à kWh directement dans le mapping
-    });
+    }));
   }
 
   public async isNewPRM(prm: string, isProduction: boolean) {
