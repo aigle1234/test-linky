@@ -133,7 +133,7 @@ export class HomeAssistantClient {
     start: number;
     end: number;
     state: number;
-    sum: number;
+    sum: number / 1000;
     change: number;
   }> {
     const isNew = await this.isNewPRM(prm, isProduction);
