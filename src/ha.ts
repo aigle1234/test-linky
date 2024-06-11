@@ -130,48 +130,57 @@ export class HomeAssistantClient {
     return !ids.result.find((statistic: any) => statistic.statistic_id === statisticId);
   }
 
-  public async findLastStatistic(
-    prm: string,
-    isProduction: boolean,
-  ): Promise<null | {
-    start: number;
-    end: number;
-    state: number;
-    sum: number;
-    change: number;
-  }> {
-    const isNew = await this.isNewPRM(prm, isProduction);
-    if (isNew) {
-      warn(`PRM ${prm} not found in Home Assistant statistics`);
-      return null;
-    }
-
-    const statisticId = getStatisticId(prm, isProduction);
-
-    // Loop over the last 52 weeks
-    for (let i = 0; i < 52; i++) {
-      const data = await this.sendMessage({
-        type: 'recorder/statistics_during_period',
-        start_time: dayjs()
-          .subtract((i + 1) * 7, 'days')
-          .format('YYYY-MM-DDT00:00:00.00Z'),
-        end_time: dayjs()
-          .subtract(i * 7, 'days')
-          .format('YYYY-MM-DDT00:00:00.00Z'),
-        statistic_ids: [statisticId],
-        period: 'day',
-      });
-      const points = data.result[statisticId];
-      if (points && points.length > 0) {
-        const lastDay = dayjs(points[points.length - 1].start).format('DD/MM/YYYY');
-        debug('Last saved statistic date is ' + lastDay);
-        return points[points.length - 1];
-      }
-    }
-
-    debug(`No statistics found for PRM ${prm} in Home Assistant`);
+public async findLastStatistic(
+  prm: string,
+  isProduction: boolean,
+): Promise<null | {
+  start: number;
+  end: number;
+  state: number;
+  sum: number;
+  change: number;
+}> {
+  const isNew = await this.isNewPRM(prm, isProduction);
+  if (isNew) {
+    warn(`PRM ${prm} not found in Home Assistant statistics`);
     return null;
   }
+
+  const statisticId = getStatisticId(prm, isProduction);
+
+  for (let i = 0; i < 52; i++) {
+    const data = await this.sendMessage({
+      type: 'recorder/statistics_during_period',
+      start_time: dayjs()
+        .subtract((i + 1) * 7, 'days')
+        .format('YYYY-MM-DDT00:00:00.00Z'),
+      end_time: dayjs()
+        .subtract(i * 7, 'days')
+        .format('YYYY-MM-DDT00:00:00.00Z'),
+      statistic_ids: [statisticId],
+      period: 'day',
+    });
+    const points = data.result[statisticId];
+    if (points && points.length > 0) {
+      const lastPoint = points[points.length - 1];
+      const lastDay = dayjs(lastPoint.start).format('DD/MM/YYYY');
+      debug('Last saved statistic date is ' + lastDay);
+      
+      // Conversion des valeurs en kWh
+      return {
+        start: lastPoint.start,
+        end: lastPoint.end,
+        state: lastPoint.state / 1000,
+        sum: lastPoint.sum / 1000,
+        change: lastPoint.change / 1000,
+      };
+    }
+  }
+
+  debug(`No statistics found for PRM ${prm} in Home Assistant`);
+  return null;
+}
+
 
   public async purge(prm: string, isProduction: boolean) {
     const statisticId = getStatisticId(prm, isProduction);
