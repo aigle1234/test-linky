@@ -99,17 +99,12 @@ export class HomeAssistantClient {
     stats: { start: string; state: number; sum: number }[],
   ) {
     const statisticId = getStatisticId(prm, isProduction);
-  
-    // Convert values from Wh to kWh
     const statsInKWh = stats.map(stat => {
       const state = stat.state / 1000;
       const sum = stat.sum / 1000;
-  
-      // Log any suspicious values
       if (state < 0 || sum < 0) {
         warn(`Invalid data detected: start=${stat.start}, state=${state}, sum=${sum}`);
       }
-  
       return {
         start: stat.start,
         state,
