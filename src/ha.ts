@@ -91,7 +91,7 @@ export class HomeAssistantClient {
       this.connection.sendUTF(JSON.stringify(message));
     });
   }
-
+  
   public async saveStatistics(
     prm: string,
     name: string,
@@ -99,27 +99,36 @@ export class HomeAssistantClient {
     stats: { start: string; state: number; sum: number }[],
   ) {
     const statisticId = getStatisticId(prm, isProduction);
-
+  
     // Convert values from Wh to kWh
-    const statsInKWh = stats.map(stat => ({
-      start: stat.start,
-      state: stat.state / 1000,
-      sum: stat.sum / 1000,
-    }));
-
-    await this.sendMessage({
-      type: 'recorder/import_statistics',
-      metadata: {
-        has_mean: false,
-        has_sum: true,
-        name,
-        source: statisticId.split(':')[0],
-        statistic_id: statisticId,
-        unit_of_measurement: 'kWh',
-      },
-      stats: statsInKWh,
+    const statsInKWh = stats.map(stat => {
+      const state = stat.state / 1000;
+      const sum = stat.sum / 1000;
+  
+      // Log any suspicious values
+      if (state < 0 || sum < 0) {
+        warn(`Invalid data detected: start=${stat.start}, state=${state}, sum=${sum}`);
+      }
+  
+      return {
+        start: stat.start,
+        state,
+        sum,
+      };
     });
   }
+  await this.sendMessage({
+    type: 'recorder/import_statistics',
+    metadata: {
+      has_mean: false,
+      has_sum: true,
+      name,
+      source: statisticId.split(':')[0],
+      statistic_id: statisticId,
+      unit_of_measurement: 'kWh',
+    },
+    stats: statsInKWh,
+  });
 
   public async isNewPRM(prm: string, isProduction: boolean) {
     const statisticId = getStatisticId(prm, isProduction);
