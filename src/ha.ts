@@ -111,7 +111,6 @@ export class HomeAssistantClient {
         sum,
       };
     });
-  }
   await this.sendMessage({
     type: 'recorder/import_statistics',
     metadata: {
