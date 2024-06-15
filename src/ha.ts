@@ -111,19 +111,19 @@ export class HomeAssistantClient {
         sum,
       };
     });
-  await this.sendMessage({
-    type: 'recorder/import_statistics',
-    metadata: {
-      has_mean: false,
-      has_sum: true,
-      name,
-      source: statisticId.split(':')[0],
-      statistic_id: statisticId,
-      unit_of_measurement: 'kWh',
-    },
-    stats: statsInKWh,
-  });
-
+    await this.sendMessage({
+      type: 'recorder/import_statistics',
+      metadata: {
+        has_mean: false,
+        has_sum: true,
+        name,
+        source: statisticId.split(':')[0],
+        statistic_id: statisticId,
+        unit_of_measurement: 'kWh',
+      },
+      stats: statsInKWh,
+    });
+  }
   public async isNewPRM(prm: string, isProduction: boolean) {
     const statisticId = getStatisticId(prm, isProduction);
     const ids = await this.sendMessage({
