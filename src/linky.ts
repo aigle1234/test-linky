@@ -13,7 +13,6 @@ export class LinkyClient {
   private session: Session;
   public prm: string;
   public isProduction: boolean;
-
   constructor(token: string, prm: string, isProduction: boolean) {
     this.prm = prm;
     this.isProduction = isProduction;
@@ -43,7 +42,7 @@ export class LinkyClient {
       const loadCurve = this.isProduction
         ? await this.session.getProductionLoadCurve(from, to)
         : await this.session.getLoadCurve(from, to);
-      history.unshift(formatLoadCurveToKWh(loadCurve.interval_reading));
+      history.unshift(formatLoadCurve(loadCurve.interval_reading));
       debug(`Successfully retrieved ${keyword} load curve from ${from} to ${to}`);
       offset += interval;
     } catch (e) {
@@ -52,7 +51,7 @@ export class LinkyClient {
     }
 
     const maxLoops = 2;
-    for (let loop = 0; loop < maxLoops; loop++) {
+    for (let loop = 0; loop < 2; loop++) {
       if (limitReached) {
         break;
       }
@@ -70,7 +69,7 @@ export class LinkyClient {
         const dailyData = this.isProduction
           ? await this.session.getDailyProduction(from, to)
           : await this.session.getDailyConsumption(from, to);
-        history.unshift(formatDailyDataToKWh(dailyData.interval_reading));
+        history.unshift(formatDailyData(dailyData.interval_reading));
         debug(`Successfully retrieved daily ${keyword} data from ${from} to ${to}`);
         offset += interval;
       } catch (e) {
@@ -95,7 +94,7 @@ export class LinkyClient {
     const dataPoints: LinkyDataPoint[] = history.flat();
 
     if (dataPoints.length === 0) {
-      warn('Data import returned nothing!');
+      warn('Data import returned nothing !');
     } else {
       const intervalFrom = dayjs(dataPoints[0].date).format('DD/MM/YYYY');
       const intervalTo = dayjs(dataPoints[dataPoints.length - 1].date).format('DD/MM/YYYY');
@@ -108,18 +107,4 @@ export class LinkyClient {
 
 function isBefore(a: Dayjs, b: Dayjs): boolean {
   return b && (a.isBefore(b, 'day') || a.isSame(b, 'day'));
-}
-
-function formatLoadCurveToKWh(loadCurve: LinkyDataPoint[]): LinkyDataPoint[] {
-  return loadCurve.map(point => ({
-    ...point,
-    value: point.value / 1000  // Assuming the value is in Wh and converting it to kWh
-  }));
-}
-
-function formatDailyDataToKWh(dailyData: LinkyDataPoint[]): LinkyDataPoint[] {
-  return dailyData.map(point => ({
-    ...point,
-    value: point.value / 1000  // Assuming the value is in Wh and converting it to kWh
-  }));
 }
