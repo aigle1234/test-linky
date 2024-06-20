@@ -5,7 +5,7 @@ export type EnergyDataPoint = { start: string; state: number; sum: number };
 
 export function formatDailyData(data: { value: string; date: string }[]): LinkyDataPoint[] {
   return data.map((r) => ({
-    value: +r.value / 1000,
+    value: Math.round(100 * (+r.value / 1000) / 100,
     date: dayjs(r.date).format('YYYY-MM-DDTHH:mm:ssZ'),
   }));
 }
