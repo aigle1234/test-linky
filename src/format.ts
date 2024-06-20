@@ -12,7 +12,7 @@ export function formatDailyData(data: { value: string; date: string }[]): LinkyD
 
 export function formatLoadCurve(data: { value: string; date: string; interval_length?: string }[]): LinkyDataPoint[] {
   const formatted = data.map((r) => ({
-    value: +r.value / 1000, // Conversion en Wh (Watt-heure) depuis kWh
+    value: +r.value,
     date: dayjs(r.date)
       .subtract(parseFloat(r.interval_length?.match(/\d+/)[0] || '1'), 'minute')
       .startOf('hour')
@@ -30,10 +30,9 @@ export function formatLoadCurve(data: { value: string; date: string; interval_le
     },
     {} as { [date: string]: number[] },
   );
-
   return Object.entries(grouped).map(([date, values]) => ({
     date,
-    value: parseFloat((values.reduce((acc, cur) => acc + cur, 0) / values.length).toFixed(1)), // Forcer une décimale
+    value: Math.round((100 * values.reduce((acc, cur) => acc + cur, 0)) / values.length) / 100,
   }));
 }
 
