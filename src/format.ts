@@ -12,7 +12,7 @@ export function formatDailyData(data: { value: string; date: string }[]): LinkyD
 
 export function formatLoadCurve(data: { value: string; date: string; interval_length?: string }[]): LinkyDataPoint[] {
   const formatted = data.map((r) => ({
-    value: Math.round(10 * +r.value / 1000) / 10,
+    value: +r.value,
     date: dayjs(r.date)
       .subtract(parseFloat(r.interval_length?.match(/\d+/)[0] || '1'), 'minute')
       .startOf('hour')
