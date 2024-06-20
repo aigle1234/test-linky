@@ -5,9 +5,9 @@ export type EnergyDataPoint = { start: string; state: number; sum: number };
 
 export function formatDailyData(data: { value: string; date: string }[]): LinkyDataPoint[] {
   return data.map((r) => {
-    const value = Math.round((+r.value / 1000) * 10) / 10;
+    const value = (+r.value / 1000).toFixed(1);
     return {
-      value: value,
+      value: parseFloat(value), // Assurez-vous que c'est un nombre avec une seule décimale
       date: dayjs(r.date).format('YYYY-MM-DDTHH:mm:ssZ'),
     };
   });
@@ -15,13 +15,17 @@ export function formatDailyData(data: { value: string; date: string }[]): LinkyD
 
 
 export function formatLoadCurve(data: { value: string; date: string; interval_length?: string }[]): LinkyDataPoint[] {
-  const formatted = data.map((r) => ({
-    value: Math.round((+r.value / 1000) * 10) / 10,
-    date: dayjs(r.date)
-      .subtract(parseFloat(r.interval_length?.match(/\d+/)[0] || '1'), 'minute')
-      .startOf('hour')
-      .format('YYYY-MM-DDTHH:mm:ssZ'),
-  }));
+  return data.map((r) => {
+    const value = (+r.value / 1000).toFixed(1);
+    return {
+      value: parseFloat(value), // Assurez-vous que c'est un nombre avec une seule décimale
+      date: dayjs(r.date)
+        .subtract(parseFloat(r.interval_length?.match(/\d+/)[0] || '1'), 'minute')
+        .startOf('hour')
+        .format('YYYY-MM-DDTHH:mm:ssZ'),
+    };
+  });
+}
   
 
   const grouped = formatted.reduce(
