@@ -30,9 +30,10 @@ export function formatLoadCurve(data: { value: string; date: string; interval_le
     },
     {} as { [date: string]: number[] },
   );
+
   return Object.entries(grouped).map(([date, values]) => ({
     date,
-    value: Math.round((10 * values.reduce((acc, cur) => acc + cur, 0)) / values.length) / 10,
+    value: parseFloat((values.reduce((acc, cur) => acc + cur, 0) / values.length).toFixed(1)), // Forcer une décimale
   }));
 }
 
