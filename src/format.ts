@@ -4,26 +4,20 @@ export type LinkyDataPoint = { date: string; value: number };
 export type EnergyDataPoint = { start: string; state: number; sum: number };
 
 export function formatDailyData(data: { value: string; date: string }[]): LinkyDataPoint[] {
-  return data.map((r) => {
-    const value = (+r.value / 1000).toFixed(1);
-    return {
-      value: parseFloat(value), // Assurez-vous que c'est un nombre avec une seule décimale
-      date: dayjs(r.date).format('YYYY-MM-DDTHH:mm:ssZ'),
-    };
-  });
+  return data.map((r) => ({
+    value: +r.value / 1000,
+    date: dayjs(r.date).format('YYYY-MM-DDTHH:mm:ssZ'),
+  }));
 }
 
 export function formatLoadCurve(data: { value: string; date: string; interval_length?: string }[]): LinkyDataPoint[] {
-  return data.map((r) => {
-    const value = (+r.value / 1000).toFixed(1);
-    return {
-      value: parseFloat(value), // Assurez-vous que c'est un nombre avec une seule décimale
-      date: dayjs(r.date)
-        .subtract(parseFloat(r.interval_length?.match(/\d+/)[0] || '1'), 'minute')
-        .startOf('hour')
-        .format('YYYY-MM-DDTHH:mm:ssZ'),
-    };
-  });
+  const formatted = data.map((r) => ({
+    value: +r.value / 1000,
+    date: dayjs(r.date)
+      .subtract(parseFloat(r.interval_length?.match(/\d+/)[0] || '1'), 'minute')
+      .startOf('hour')
+      .format('YYYY-MM-DDTHH:mm:ssZ'),
+  }));
 
   const grouped = formatted.reduce(
     (acc, cur) => {
@@ -36,10 +30,9 @@ export function formatLoadCurve(data: { value: string; date: string; interval_le
     },
     {} as { [date: string]: number[] },
   );
-
   return Object.entries(grouped).map(([date, values]) => ({
     date,
-    value: Math.round((100 * values.reduce((acc, cur) => acc + cur, 0)) / values.length) / 100,
+    value: Math.round((1000 * values.reduce((acc, cur) => acc + cur, 0)) / values.length) / 1000,
   }));
 }
 
