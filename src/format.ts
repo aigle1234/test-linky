@@ -5,14 +5,14 @@ export type EnergyDataPoint = { start: string; state: number; sum: number };
 
 export function formatDailyData(data: { value: string; date: string }[]): LinkyDataPoint[] {
   return data.map((r) => ({
-    value: Math.round((+r.value + Number.EPSILON) * 1000) / 1000,
+    value: Math.round((parseFloat(r.value) + Number.EPSILON) * 100) / 100, // Arrondi à deux décimales
     date: dayjs(r.date).format('YYYY-MM-DDTHH:mm:ssZ'),
   }));
 }
 
 export function formatLoadCurve(data: { value: string; date: string; interval_length?: string }[]): LinkyDataPoint[] {
   const formatted = data.map((r) => ({
-    value: Math.round((+r.value + Number.EPSILON) * 1000) / 1000,
+    value: Math.round((parseFloat(r.value) + Number.EPSILON) * 100) / 100, // Arrondi à deux décimales
     date: dayjs(r.date)
       .subtract(parseFloat(r.interval_length?.match(/\d+/)[0] || '1'), 'minute')
       .startOf('hour')
