@@ -32,7 +32,7 @@ export function formatLoadCurve(data: { value: string; date: string; interval_le
   );
   return Object.entries(grouped).map(([date, values]) => ({
     date,
-    value: ((values.reduce((acc, cur) => acc + cur, 0) / values.length) / 1000).toFixed(1),
+    value: parseFloat((values.reduce((acc, cur) => acc + cur, 0) / values.length / 1000).toFixed(1)),
   }));
 }
 
