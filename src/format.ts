@@ -13,7 +13,6 @@ export function formatDailyData(data: { value: string; date: string }[]): LinkyD
   });
 }
 
-
 export function formatLoadCurve(data: { value: string; date: string; interval_length?: string }[]): LinkyDataPoint[] {
   return data.map((r) => {
     const value = (+r.value / 1000).toFixed(1);
@@ -25,8 +24,6 @@ export function formatLoadCurve(data: { value: string; date: string; interval_le
         .format('YYYY-MM-DDTHH:mm:ssZ'),
     };
   });
-}
-  
 
   const grouped = formatted.reduce(
     (acc, cur) => {
