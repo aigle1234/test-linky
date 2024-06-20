@@ -108,7 +108,7 @@ export class HomeAssistantClient {
         name,
         source: statisticId.split(':')[0],
         statistic_id: statisticId,
-        unit_of_measurement: 'kWh',
+        unit_of_measurement: 'Wh',
       },
       stats,
     });
