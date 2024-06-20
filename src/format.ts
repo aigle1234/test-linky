@@ -5,7 +5,7 @@ export type EnergyDataPoint = { start: string; state: number; sum: number };
 
 export function formatDailyData(data: { value: string; date: string }[]): LinkyDataPoint[] {
   return data.map((r) => ({
-    value: Math.round(10 * +r.value / 1000) / 10,
+    value: +r.value,
     date: dayjs(r.date).format('YYYY-MM-DDTHH:mm:ssZ'),
   }));
 }
@@ -32,7 +32,7 @@ export function formatLoadCurve(data: { value: string; date: string; interval_le
   );
   return Object.entries(grouped).map(([date, values]) => ({
     date,
-    value: Math.round((100 * values.reduce((acc, cur) => acc + cur, 0)) / values.length) / 100,
+    value: Math.round(10 * (Math.round((100 * values.reduce((acc, cur) => acc + cur, 0)) / values.length) / 100)) / 10,
   }));
 }
 
